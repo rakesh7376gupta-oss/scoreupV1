@@ -1,0 +1,16 @@
+{
+  "name": "scoreup-ai",
+  "version": "1.0.0",
+  "description": "ScoreUp.AI - JEE NEET 11th 12th Doubt Solver",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "mongodb": "^6.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^35.0.0"
+  }
+}

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ScoreUp.AI — JEE | NEET | 11th | 12th Doubt Solver</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #050814;
+      --surface: #0d1224;
+      --surface2: #111827;
+      --border: rgba(99,179,237,0.15);
+      --cyan: #38bdf8;
+      --cyan-glow: rgba(56,189,248,0.15);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245,158,11,0.12);
+      --green: #34d399;
+      --text: #f0f4ff;
+      --muted: #8899bb;
+      --radius: 14px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
+      background-size: 44px 44px; pointer-events: none; z-index: 0;
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+    .orb-1 { width: 500px; height: 500px; background: rgba(56,189,248,0.07); top: -150px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(245,158,11,0.06); bottom: 100px; left: -150px; }
+
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,8,20,0.88); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--cyan), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-badge {
+      background: var(--cyan-glow); border: 1px solid var(--border);
+      color: var(--cyan); padding: 6px 14px; border-radius: 50px;
+      font-size: 0.78rem; font-weight: 600;
+    }
+
+    .hero {
+      position: relative; z-index: 1; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 110px 24px 60px; text-align: center;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold-glow); border: 1px solid rgba(245,158,11,0.3);
+      color: var(--gold); padding: 7px 16px; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600; margin-bottom: 28px;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px;
+    }
+    h1 .highlight {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub { color: var(--muted); font-size: 1.05rem; max-width: 520px; line-height: 1.7; margin-bottom: 36px; }
+
+    .exam-pills { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 44px; }
+    .pill {
+      padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; border: 1.5px solid var(--border);
+      background: var(--surface); color: var(--muted);
+    }
+    .pill:hover, .pill.active {
+      border-color: var(--cyan); color: var(--cyan);
+      background: var(--cyan-glow); transform: translateY(-1px);
+    }
+
+    .stats-bar { display: flex; justify-content: center; gap: 44px; margin-bottom: 44px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+    .ask-card {
+      width: 100%; max-width: 780px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 26px; position: relative; overflow: hidden;
+    }
+    .ask-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--gold), transparent);
+    }
+
+    .subject-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .subject-btn {
+      padding: 7px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-family: inherit;
+    }
+    .subject-btn:hover, .subject-btn.active {
+      background: var(--cyan-glow); border-color: var(--cyan); color: var(--cyan);
+    }
+
+    /* UPLOAD ZONE */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 28px 20px; text-align: center; cursor: pointer;
+      transition: all 0.25s; margin-bottom: 16px; position: relative;
+      background: rgba(56,189,248,0.02);
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--cyan); background: var(--cyan-glow);
+    }
+    .upload-zone input {
+      position: absolute; inset: 0; opacity: 0;
+      cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 2.2rem; margin-bottom: 10px; display: block; transition: transform 0.2s; }
+    .upload-zone:hover .upload-icon { transform: scale(1.15) rotate(-5deg); }
+    .upload-title { color: var(--cyan); font-weight: 700; font-size: 0.95rem; margin-bottom: 5px; }
+    .upload-sub { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+    /* IMAGE PREVIEW */
+    .img-preview-wrap {
+      position: relative; margin-bottom: 16px; display: none;
+    }
+    .img-preview {
+      width: 100%; max-height: 280px; object-fit: contain;
+      border-radius: var(--radius); border: 1.5px solid var(--border);
+      background: var(--bg); display: block;
+    }
+    .remove-img {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(239,68,68,0.9); color: white;
+      border: none; border-radius: 50%; width: 30px; height: 30px;
+      cursor: pointer; font-size: 0.9rem; display: flex;
+      align-items: center; justify-content: center;
+      transition: all 0.2s; font-weight: bold;
+    }
+    .remove-img:hover { background: #ef4444; transform: scale(1.1); }
+    .img-label {
+      position: absolute; bottom: 10px; left: 10px;
+      background: rgba(52,211,153,0.9); color: #064e3b;
+      padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+    }
+
+    .or-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px; color: var(--muted); font-size: 0.8rem;
+    }
+    .or-divider::before, .or-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    textarea {
+      width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px; color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem;
+      resize: none; min-height: 90px; transition: border-color 0.2s;
+      outline: none; line-height: 1.6; margin-bottom: 16px;
+    }
+    textarea::placeholder { color: var(--muted); }
+    textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(56,189,248,0.08); }
+
+    .card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .char-count { color: var(--muted); font-size: 0.8rem; }
+
+    .ask-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: white; border: none; padding: 13px 30px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; font-family: 'Syne', sans-serif;
+    }
+    .ask-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14,165,233,0.35); }
+    .ask-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .error-msg {
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5; padding: 14px 18px; border-radius: var(--radius);
+      font-size: 0.9rem; margin-top: 14px; display: none;
+    }
+    .error-msg.visible { display: block; animation: fadeUp 0.3s ease; }
+
+    .answer-section { width: 100%; max-width: 780px; margin-top: 22px; display: none; }
+    .answer-section.visible { display: block; animation: fadeUp 0.4s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .answer-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+    .answer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 22px; background: var(--surface2); border-bottom: 1px solid var(--border);
+      flex-wrap: wrap; gap: 10px;
+    }
+    .answer-label {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+      color: var(--cyan); display: flex; align-items: center; gap: 8px;
+    }
+    .mode-tag {
+      font-size: 0.72rem; padding: 3px 9px; border-radius: 5px; font-weight: 600;
+    }
+    .mode-tag.img { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+    .mode-tag.txt { background: var(--cyan-glow); color: var(--cyan); border: 1px solid rgba(56,189,248,0.2); }
+    .action-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 5px 12px; border-radius: 6px; font-size: 0.78rem;
+      cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .action-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── ANSWER BODY — ChatGPT/Google style ── */
+    .answer-body {
+      padding: 28px; line-height: 1.85; color: #d4e0f7; font-size: 0.96rem;
+    }
+    .answer-body h1 {
+      font-family: 'Syne', sans-serif; color: var(--cyan);
+      font-size: 1.35rem; margin: 22px 0 10px; line-height: 1.3;
+      padding-bottom: 8px; border-bottom: 1px solid rgba(56,189,248,0.2);
+    }
+    .answer-body h2 {
+      font-family: 'Syne', sans-serif; color: var(--gold);
+      font-size: 1.1rem; margin: 18px 0 8px; line-height: 1.3;
+    }
+    .answer-body h3 {
+      font-family: 'Syne', sans-serif; color: #a5f3fc;
+      font-size: 1rem; margin: 14px 0 6px;
+    }
+    .answer-body p { margin-bottom: 12px; }
+    .answer-body ul, .answer-body ol { padding-left: 24px; margin-bottom: 14px; }
+    .answer-body li { margin-bottom: 7px; }
+    .answer-body strong { color: var(--text); font-weight: 700; }
+    .answer-body em { color: var(--gold); font-style: normal; }
+    .answer-body code {
+      background: rgba(56,189,248,0.1); color: var(--cyan);
+      padding: 2px 8px; border-radius: 5px; font-size: 0.88em;
+      font-family: 'Courier New', monospace;
+    }
+    .answer-body pre {
+      background: #030712; border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px; margin: 14px 0; overflow-x: auto;
+    }
+    .answer-body pre code { background: none; padding: 0; color: var(--green); }
+    .answer-body blockquote {
+      border-left: 3px solid var(--cyan); padding: 10px 18px;
+      color: var(--muted); margin: 14px 0;
+      background: rgba(56,189,248,0.04); border-radius: 0 8px 8px 0;
+    }
+    .answer-body hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+    .answer-body table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .answer-body th {
+      background: var(--surface2); color: var(--cyan); padding: 10px 14px;
+      font-weight: 700; text-align: left; border: 1px solid var(--border);
+      font-family: 'Syne', sans-serif;
+    }
+    .answer-body td { padding: 9px 14px; border: 1px solid var(--border); }
+    .answer-body tr:nth-child(even) td { background: rgba(56,189,248,0.03); }
+
+    /* LOADING */
+    .loading-wrap { padding: 28px; }
+    .loading-label {
+      color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .loading-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--cyan);
+      display: inline-block; animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, rgba(56,189,248,0.06) 50%, var(--surface2) 75%);
+      background-size: 200% 100%; animation: shimmer 1.5s infinite;
+      border-radius: 6px; height: 13px; margin-bottom: 11px;
+    }
+    .skeleton:nth-child(1){width:55%} .skeleton:nth-child(2){width:92%}
+    .skeleton:nth-child(3){width:78%} .skeleton:nth-child(4){width:88%}
+    .skeleton:nth-child(5){width:45%}
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* HISTORY */
+    .history-section { width: 100%; max-width: 780px; margin-top: 32px; z-index: 1; position: relative; padding-bottom: 60px; }
+    .history-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--muted); margin-bottom: 14px; }
+    .history-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px;
+      cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 14px;
+    }
+    .history-item:hover { border-color: var(--cyan); background: var(--surface2); }
+    .hist-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
+    .hist-icon { width: 44px; height: 44px; border-radius: 8px; background: var(--cyan-glow); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .hist-content { flex: 1; min-width: 0; }
+    .history-q { font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-meta { font-size: 0.76rem; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .hist-tag { padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; background: var(--cyan-glow); color: var(--cyan); }
+    .hist-tag.gold { background: var(--gold-glow); color: var(--gold); }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 18px; }
+      .ask-card { padding: 18px; }
+      h1 { letter-spacing: -0.5px; }
+      .stats-bar { gap: 24px; }
+      .answer-body { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<nav>
+  <div class="logo">ScoreUp.AI</div>
+  <div class="nav-badge">✦ AI POWERED</div>
+</nav>
+
+<section class="hero">
+
+  <div class="hero-tag">⚡ India's Smartest Doubt Solver</div>
+
+  <h1>Crack <span class="highlight">JEE & NEET</span><br>With AI Guidance</h1>
+
+  <p class="hero-sub">
+    📸 Photo khicho ya ✍️ type karo — step-by-step solution milega.<br>
+    Physics · Chemistry · Maths · Biology
+  </p>
+
+  <div class="exam-pills">
+    <div class="pill active" onclick="selectExam(this,'JEE')">🎯 JEE</div>
+    <div class="pill" onclick="selectExam(this,'NEET')">🧬 NEET</div>
+    <div class="pill" onclick="selectExam(this,'11th')">📗 Class 11th</div>
+    <div class="pill" onclick="selectExam(this,'12th')">📘 Class 12th</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Questions Solved</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Subjects</div></div>
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Always Available</div></div>
+  </div>
+
+  <!-- MAIN CARD -->
+  <div class="ask-card">
+
+    <div class="subject-row">
+      <button class="subject-btn active" onclick="selectSubject(this,'Physics')">⚛️ Physics</button>
+      <button class="subject-btn" onclick="selectSubject(this,'Chemistry')">🧪 Chemistry</button>
+      <button class="subject-btn" onclick="selectSubject(this,'Maths')">📐 Maths</button>
+      <button class="subject-btn" onclick="selectSubject(this,'Biology')">🧬 Biology</button>
+    </div>
+
+    <!-- PHOTO UPLOAD -->
+    <div class="upload-zone" id="uploadZone"
+      ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+      <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="onFileSelect(event)">
+      <span class="upload-icon">📸</span>
+      <div class="upload-title">Photo Click Karo ya Yahan Drop Karo</div>
+      <div class="upload-sub">
+        Handwritten question, textbook page, ya screenshot — sab chalega<br>
+        <small>JPG · PNG · WEBP &nbsp;|&nbsp; Max 10MB</small>
+      </div>
+    </div>
+
+    <!-- IMAGE PREVIEW -->
+    <div class="img-preview-wrap" id="previewWrap">
+      <img id="imgPreview" class="img-preview" alt="Question photo">
+      <button class="remove-img" onclick="removeImage()">✕</button>
+      <div class="img-label">📸 Image Ready</div>
+    </div>
+
+    <div class="or-divider">ya text mein type karo</div>
+
+    <textarea
+      id="questionInput"
+      placeholder="Question yahan likho... (optional agar photo upload ki ho)&#10;&#10;Ctrl+Enter se bhi submit kar sakte ho!"
+      maxlength="1000"
+      oninput="updateChar()"
+    ></textarea>
+
+    <div class="card-footer">
+      <span class="char-count"><span id="charCount">0</span>/1000</span>
+      <button class="ask-btn" onclick="askQuestion()" id="askBtn">
+        🔍 Solve Karo
+      </button>
+    </div>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- ANSWER -->
+  <div class="answer-section" id="answerSection">
+    <div class="answer-card">
+      <div class="answer-header">
+        <div class="answer-label">
+          🤖 ScoreUp AI Answer
+          <span class="mode-tag txt" id="modeTag">Text Mode</span>
+        </div>
+        <button class="action-btn" onclick="copyAnswer()">📋 Copy</button>
+      </div>
+      <div class="answer-body" id="answerBody"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-section" id="historySection" style="display:none">
+    <div class="history-title">📚 Recent Questions</div>
+    <div id="historyList"></div>
+  </div>
+
+</section>
+
+<script>
+  let selectedExam = 'JEE';
+  let selectedSubject = 'Physics';
+  let uploadedBase64 = null;
+  let uploadedType = null;
+  let historyData = [];
+
+  function selectExam(el, exam) {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active'); selectedExam = exam;
+  }
+  function selectSubject(el, sub) {
+    document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active'); selectedSubject = sub;
+  }
+  function updateChar() {
+    document.getElementById('charCount').textContent = document.getElementById('questionInput').value.length;
+  }
+
+  function onDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('dragover'); }
+  function onDragLeave() { document.getElementById('uploadZone').classList.remove('dragover'); }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processImage(file);
+  }
+  function onFileSelect(e) { if (e.target.files[0]) processImage(e.target.files[0]); }
+
+  function processImage(file) {
+    if (!file.type.startsWith('image/')) { showError('Sirf image files allowed hain!'); return; }
+    if (file.size > 10 * 1024 * 1024) { showError('Image 10MB se chhoti honi chahiye!'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target.result;
+      uploadedBase64 = result.split(',')[1];
+      uploadedType = file.type;
+      document.getElementById('imgPreview').src = result;
+      document.getElementById('previewWrap').style.display = 'block';
+      document.getElementById('uploadZone').style.display = 'none';
+      document.getElementById('modeTag').textContent = '📸 Image Mode';
+      document.getElementById('modeTag').className = 'mode-tag img';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    uploadedBase64 = null; uploadedType = null;
+    document.getElementById('imgPreview').src = '';
+    document.getElementById('previewWrap').style.display = 'none';
+    document.getElementById('uploadZone').style.display = 'block';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('modeTag').textContent = 'Text Mode';
+    document.getElementById('modeTag').className = 'mode-tag txt';
+  }
+
+  async function askQuestion() {
+    const q = document.getElementById('questionInput').value.trim();
+    if (!q && !uploadedBase64) { showError('❗ Question likho ya photo daalo!'); return; }
+
+    const btn = document.getElementById('askBtn');
+    const ansSection = document.getElementById('answerSection');
+    const ansBody = document.getElementById('answerBody');
+    hideError();
+
+    btn.disabled = true; btn.textContent = '⏳ AI Soch Raha Hai...';
+    ansSection.classList.add('visible');
+    ansBody.innerHTML = `
+      <div class="loading-wrap">
+        <div class="loading-label"><span class="loading-dot"></span> ScoreUp AI step-by-step answer bana raha hai...</div>
+        <div class="skeleton"></div><div class="skeleton"></div>
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>`;
+
+    try {
+      const payload = {
+        question: q || 'Is image mein jo question hai uska detailed step-by-step answer do',
+        subject: selectedSubject,
+        exam: selectedExam
+      };
+      if (uploadedBase64) { payload.image = uploadedBase64; payload.imageType = uploadedType; }
+
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Server error aa gaya');
+
+      renderAnswer(ansBody, data.answer);
+      addToHistory(q || '📸 Photo Question', data.answer, selectedSubject, selectedExam, uploadedBase64);
+
+    } catch (err) {
+      ansSection.classList.remove('visible');
+      showError('❌ ' + err.message);
+    }
+
+    btn.disabled = false; btn.textContent = '🔍 Solve Karo';
+  }
+
+  function renderAnswer(container, rawText) {
+    marked.setOptions({ breaks: true, gfm: true });
+    container.innerHTML = marked.parse(rawText);
+    if (window.renderMathInElement) {
+      renderMathInElement(container, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+    container.closest('.answer-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function addToHistory(q, a, sub, exam, thumb) {
+    historyData.unshift({ q, a, sub, exam, thumb, time: new Date().toLocaleTimeString() });
+    if (historyData.length > 10) historyData.pop();
+    document.getElementById('totalCount').textContent = parseInt(document.getElementById('totalCount').textContent) + 1;
+    const sec = document.getElementById('historySection');
+    sec.style.display = 'block';
+    document.getElementById('historyList').innerHTML = historyData.map((h, i) => `
+      <div class="history-item" onclick="showHistoryItem(${i})">
+        ${h.thumb ? `<img src="data:image/jpeg;base64,${h.thumb}" class="hist-thumb">` : `<div class="hist-icon">💬</div>`}
+        <div class="hist-content">
+          <div class="history-q">${h.q}</div>
+          <div class="history-meta">
+            <span class="hist-tag">${h.exam}</span>
+            <span class="hist-tag gold">${h.sub}</span>
+            <span>${h.time}</span>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function showHistoryItem(i) {
+    const h = historyData[i];
+    if (h.q !== '📸 Photo Question') { document.getElementById('questionInput').value = h.q; updateChar(); }
+    const ansSection = document.getElementById('answerSection');
+    ansSection.classList.add('visible');
+    renderAnswer(document.getElementById('answerBody'), h.a);
+  }
+
+  function copyAnswer() {
+    navigator.clipboard.writeText(document.getElementById('answerBody').innerText).then(() => {
+      const btn = document.querySelector('.action-btn');
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 2000);
+    });
+  }
+
+  function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('visible'); }
+  function hideError() { document.getElementById('errorMsg').classList.remove('visible'); }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('questionInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.ctrlKey) askQuestion();
+    });
+  });
+</script>
+</body>
+</html>
